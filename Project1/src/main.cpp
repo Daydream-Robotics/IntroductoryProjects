@@ -1,4 +1,5 @@
 #include "main.h"
+#include "constants.h"
 
 /**
  * A callback function for LLEMU's center button.
@@ -75,20 +76,22 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::MotorGroup left_mg({1, -2, 3});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({-4, 5, -6});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
+
+	// TODO: You will need to add your own motor ports here (in the constants.h file)
+	pros::MotorGroup left_mg(LEFT_MOTOR_PORTS); 
+	pros::MotorGroup right_mg(RIGHT_MOTOR_PORTS);
 
 
+	// TODO: Define the while loop for Arcade control
 	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
-
-		// Arcade control scheme
-		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		left_mg.move(dir - turn);                      // Sets left motor voltage
-		right_mg.move(dir + turn);                     // Sets right motor voltage
+		//! List of helpful commands
+		// pros::lcd::print(); will print to the V5 Brain's LCD screen. Use this for debugging.
+		// pros::MotorGroup.move(); will set the voltage of the motors in the group, use this for movement. ** It is recommended to use this movement command as it is the most reliable.
+		// pros::Controller.get_analog(); will get the value of the analog stick on the controller (thumbsticks)
+		// pros::Controller.get_digital(); will get the value of the digital buttons on the controller (buttons)
+		// pros::delay(); will delay the program for a specified amount of time in milliseconds
+		
+		//! It is very important that you include a delay in your loops. This prevents the CPU from being overloaded and allows other tasks to run smoothly.
 		pros::delay(20);                               // Run for 20 ms then update
 	}
 }
