@@ -75,11 +75,11 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 	// TODO: You will need to add your own motor ports here (in the include/constants.h file)
-	pros::MotorGroup left_mg(LEFT_MOTOR_PORTS); 
-	pros::MotorGroup right_mg(RIGHT_MOTOR_PORTS);
+	pros::MotorGroup leftMotors(LEFT_MOTOR_PORTS); 
+	pros::MotorGroup rightMotors(RIGHT_MOTOR_PORTS);
 
 
 	// TODO: Define the while loop for Arcade control
