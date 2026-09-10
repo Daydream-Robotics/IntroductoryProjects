@@ -14,8 +14,8 @@ constexpr int PARALLEL_TRACKING_WHEEL_PORT = 6;
 constexpr int PERPENDICULAR_TRACKING_WHEEL_PORT = 10;
 
 // TODO: Fix these ports to match your robot's configuration. The left and right drive wheel ports order does not matter, but left vs right does.
-#define LEFT_DRIVE_WHEEL_PORTS {-11, -12, -13}
-#define RIGHT_DRIVE_WHEEL_PORTS {18, 19, 20}
+#define LEFT_DRIVE_WHEEL_PORTS {-11}
+#define RIGHT_DRIVE_WHEEL_PORTS {20}
 
 constexpr int INITIAL_INTAKE_PORT = 1;
 constexpr int INITIAL_INTAKE_PORT2 = -17;
