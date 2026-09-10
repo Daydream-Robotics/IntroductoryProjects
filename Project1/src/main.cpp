@@ -1,6 +1,9 @@
 #include "main.h"
-#include "constants.h"
+#include "backend/constants.h"
+#include "backend/subsystems.hpp"
 #include "turnPID.hpp"
+#include <algorithm>
+#include <cstdlib>
 
 /**
  * A callback function for LLEMU's center button.
@@ -24,12 +27,18 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-// 
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+
+	pros::lcd::set_text(1, "Calibrating IMU: keep still");
+	if (imu.reset(true) == PROS_ERR) {
+		pros::lcd::set_text(1, "IMU calibration failed");
+	} else {
+		pros::lcd::set_text(1, "IMU ready");
+	}
 }
 
 /**
@@ -62,7 +71,7 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	// ! This is the code that will run the turn PID. You need to fill this out in turnPID.cpp. You will also need to tune the PID values in turnPID.h.
+	// ! Implement the turn PID and tune KP, KI, and KD in src/turnPID.cpp.
 	// ! Do NOT change the code below
 	turnPID turnController;
 
@@ -98,20 +107,29 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller controller(pros::E_CONTROLLER_MASTER);
-
-	// TODO: You will need to add your own motor ports here (in the include/constants.h file)
-	pros::MotorGroup leftMotors(LEFT_MOTOR_PORTS); 
-	pros::MotorGroup rightMotors(RIGHT_MOTOR_PORTS);
-
-
-
 	while (true) {
 		// Configured to Arcade currently
 		int fwd = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
-		leftMotors.move(fwd - turn);
-		rightMotors.move(fwd + turn);
+		if (std::abs(fwd) < DEADZONE) {
+			fwd = 0;
+		}
+		if (std::abs(turn) < DEADZONE) {
+			turn = 0;
+		}
+
+		int left = fwd - turn;
+		int right = fwd + turn;
+
+		// Scale both outputs together to preserve their ratio within +/-127.
+		const int peak = std::max(std::abs(left), std::abs(right));
+		if (peak > MAX_VOLTAGE) {
+			left = left * MAX_VOLTAGE / peak;
+			right = right * MAX_VOLTAGE / peak;
+		}
+
+		leftMotors.move(left);
+		rightMotors.move(right);
 		
 		pros::delay(10);                               // Run for 10 ms then update
 	}

@@ -68,10 +68,7 @@ constexpr double HEADING_KI = 0.0;
 constexpr double HEADING_KD = 0.0;  
 constexpr double HEADING_KI_THRESHOLD = 0.0;
 
-constexpr double TURN_KP = 1.2; 
-constexpr double TURN_KI = 0.01; 
-constexpr double TURN_KD = 0.001; 
-constexpr double TURN_KI_THRESHOLD = 15.0;
+// Tune the turn PID gains in src/turnPID.cpp.
 
 
 /* - - - - - - - - - - - - - - [Motion Controllers] - - - - - - - - - - - - - - */
