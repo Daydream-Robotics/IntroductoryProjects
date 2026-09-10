@@ -1,5 +1,5 @@
 #include "main.h"
-#include "constants.h"
+#include "turnPID.hpp"
 
 /**
  * A callback function for LLEMU's center button.
@@ -23,6 +23,7 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+// 
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
@@ -59,7 +60,27 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	// ! This is the code that will run the turn PID. You need to fill this out in turnPID.cpp. You will also need to tune the PID values in turnPID.h.
+	turnPID turnController;
+
+	turnController.turnAbsolute(90);
+	pros::delay(200);
+	turnController.turnAbsolute(-90);
+	pros::delay(200);
+	turnController.turnAbsolute(-45);
+	pros::delay(200);
+	turnController.turnAbsolute(0);
+	pros::lcd::print(0, "Turn Absolute Test Complete");
+	pros::delay(1000);
+
+	turnController.turnRelative(90);
+	pros::delay(200);
+	turnController.turnRelative(-90);
+	pros::delay(200);
+	pros::lcd::print(0, "Turn Relative Test Complete");
+	pros::delay(1000);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -82,16 +103,14 @@ void opcontrol() {
 	pros::MotorGroup right_mg(RIGHT_MOTOR_PORTS);
 
 
-	// TODO: Define the while loop for Arcade control
+
 	while (true) {
-		//! List of helpful commands
-		// pros::lcd::print(); will print to the V5 Brain's LCD screen. Use this for debugging.
-		// pros::MotorGroup.move(); will set the voltage of the motors in the group, use this for movement. ** It is recommended to use this movement command as it is the most reliable.
-		// pros::Controller.get_analog(); will get the value of the analog stick on the controller (thumbsticks)
-		// pros::Controller.get_digital(); will get the value of the digital buttons on the controller (buttons)
-		// pros::delay(); will delay the program for a specified amount of time in milliseconds
+		// Configured to Arcade currently
+		int fwd = master.get_analog(ANALOG_LEFT_Y);
+		int turn = master.get_analog(ANALOG_RIGHT_X);
+		left_mg.move(fwd - turn);
+		right_mg.move(fwd + turn);
 		
-		//! It is very important that you include a delay in your loops. This prevents the CPU from being overloaded and allows other tasks to run smoothly.
-		pros::delay(20);                               // Run for 20 ms then update
+		pros::delay(10);                               // Run for 10 ms then update
 	}
 }
