@@ -4,7 +4,7 @@
 
 /**
  * @brief Normalize angle between [-pi, +pi]
- * @param Angle in radians
+ * @param a Angle in radians
  * @returns Angle in radians between -pi and pi
  */
 double normalizeAngle(double a);

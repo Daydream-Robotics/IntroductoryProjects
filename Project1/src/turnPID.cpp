@@ -32,6 +32,7 @@ void turnPID::turnAbsolute(double target) {
     //   2. Call update(target, currentHeading); it calculates dt internally.
     //   3. Apply returned values to the drive motors.
     //   4. Delay briefly before the next iteration.
+    //   5. Stop both drive motors after the loop
 }
 
 void turnPID::turnRelative(double target) {
@@ -44,6 +45,7 @@ void turnPID::turnRelative(double target) {
     //   2. Call update(targetDegrees, currentHeading); it calculates dt internally.
     //   3. Apply returned values to the drive motors.
     //   4. Delay briefly before the next iteration.
+    //   5. Stop both drive motors after the loop
 }
 
 void turnPID::reset() {
