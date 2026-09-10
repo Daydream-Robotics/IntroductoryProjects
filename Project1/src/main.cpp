@@ -1,6 +1,9 @@
 #include "main.h"
 #include "constants.h"
 
+// * Scroll down to opcontrol()
+// * HINT: hover over functions to read their documentation
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -75,11 +78,11 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 	// TODO: You will need to add your own motor ports here (in the include/constants.h file)
-	pros::MotorGroup left_mg(LEFT_MOTOR_PORTS); 
-	pros::MotorGroup right_mg(RIGHT_MOTOR_PORTS);
+	pros::MotorGroup leftMotors(LEFT_MOTOR_PORTS); 
+	pros::MotorGroup rightMotors(RIGHT_MOTOR_PORTS);
 
 
 	// TODO: Define the while loop for Arcade control
@@ -90,6 +93,26 @@ void opcontrol() {
 		// pros::Controller.get_analog(); will get the value of the analog stick on the controller (thumbsticks)
 		// pros::Controller.get_digital(); will get the value of the digital buttons on the controller (buttons)
 		// pros::delay(); will delay the program for a specified amount of time in milliseconds
+
+		// Get joystick values
+		int power = controller.get_analog(ANALOG_LEFT_Y);
+		int turn = controller.get_analog(ANALOG_RIGHT_X);
+
+		// apply deadzone
+		if (abs(power) < DEADZONE) {
+			power = 0;
+		}
+		if (abs(turn) < DEADZONE) {
+			power = 0;
+		}
+
+		// Calculate left and right motor powers
+		int left = power + turn;
+		int right = power - turn;
+
+		// move motors
+		leftMotors.move(left);
+		rightMotors.move(right);
 
 		//! It is very important that you include a delay in your loops. This prevents the CPU from being overloaded and allows other tasks to run smoothly.
 		pros::delay(20);                               // Run for 20 ms then update
