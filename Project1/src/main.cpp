@@ -77,7 +77,7 @@ void autonomous() {}
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-	// TODO: You will need to add your own motor ports here (in the constants.h file)
+	// TODO: You will need to add your own motor ports here (in the include/constants.h file)
 	pros::MotorGroup left_mg(LEFT_MOTOR_PORTS); 
 	pros::MotorGroup right_mg(RIGHT_MOTOR_PORTS);
 
@@ -90,7 +90,7 @@ void opcontrol() {
 		// pros::Controller.get_analog(); will get the value of the analog stick on the controller (thumbsticks)
 		// pros::Controller.get_digital(); will get the value of the digital buttons on the controller (buttons)
 		// pros::delay(); will delay the program for a specified amount of time in milliseconds
-		
+
 		//! It is very important that you include a delay in your loops. This prevents the CPU from being overloaded and allows other tasks to run smoothly.
 		pros::delay(20);                               // Run for 20 ms then update
 	}
