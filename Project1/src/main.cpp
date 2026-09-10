@@ -1,4 +1,5 @@
 #include "main.h"
+#include "constants.h"
 #include "turnPID.hpp"
 
 /**
@@ -97,20 +98,20 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-	// TODO: You will need to add your own motor ports here (in the constants.h file)
-	pros::MotorGroup left_mg(LEFT_MOTOR_PORTS); 
-	pros::MotorGroup right_mg(RIGHT_MOTOR_PORTS);
+	// TODO: You will need to add your own motor ports here (in the include/constants.h file)
+	pros::MotorGroup leftMotors(LEFT_MOTOR_PORTS); 
+	pros::MotorGroup rightMotors(RIGHT_MOTOR_PORTS);
 
 
 
 	while (true) {
 		// Configured to Arcade currently
-		int fwd = master.get_analog(ANALOG_LEFT_Y);
-		int turn = master.get_analog(ANALOG_RIGHT_X);
-		left_mg.move(fwd - turn);
-		right_mg.move(fwd + turn);
+		int fwd = controller.get_analog(ANALOG_LEFT_Y);
+		int turn = controller.get_analog(ANALOG_RIGHT_X);
+		leftMotors.move(fwd - turn);
+		rightMotors.move(fwd + turn);
 		
 		pros::delay(10);                               // Run for 10 ms then update
 	}
