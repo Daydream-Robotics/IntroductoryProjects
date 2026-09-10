@@ -2,7 +2,11 @@
 
 #include "odometry.hpp" // Needed for the Position struct
 
-// Normalize angle between [-180, 180] 
+/**
+ * @brief Normalize angle between [-pi, +pi]
+ * @param Angle in radians
+ * @returns Angle in radians between -pi and pi
+ */
 double normalizeAngle(double a);
 
 // Return Euclidean distance btwn points p1 and p2

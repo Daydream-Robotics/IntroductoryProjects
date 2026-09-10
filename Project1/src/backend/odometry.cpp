@@ -8,16 +8,15 @@
 Odometry::Odometry(OdomConfig config) : m_config(config) {}
 
 void Odometry::updatePose(void) {
-	const double yaw_deg = getYaw(); 
+	const double yaw_rad = getYaw();
 	
-	if (yaw_deg < -180.0) {
-		pros::lcd::print(0, "[Update Pose] IMU Failure! %lf", yaw_deg);
+	if (yaw_rad < -std::numbers::pi) {
+		pros::lcd::print(0, "[Update Pose] IMU Failure! %lf", yaw_rad);
 		return;
 	}
 	
 	// Get orientation from IMU
-	double theta_rad = convertDegToRad(yaw_deg);
-	theta_rad = normalizeAngle(theta_rad);
+	double theta_rad = normalizeAngle(yaw_rad);
 	
 	if (!m_initialized) {
 		m_prevTheta = theta_rad;
@@ -133,11 +132,8 @@ double Odometry::getYaw(void) {
 	// yaw formula = atan2(2(wz + xy), 1 - 2(y^2 + z^2))
 	double yaw_rad = std::atan2(2 * ((qt.w * qt.z) + (qt.x * qt.y)), 1 - (2 * ((qt.y * qt.y) + (qt.z * qt.z))));
 
-	// convert to degrees
-	double yaw_deg = yaw_rad * (180.0 / std::numbers::pi);
-
-	// angle is returned from -180 to 180
-	return -yaw_deg;
+	// angle is returned in radians from -pi to pi, counterclockwise positive
+	return -yaw_rad;
 }
 
 WheelLengths Odometry::getOdomWheelTravel(void) {

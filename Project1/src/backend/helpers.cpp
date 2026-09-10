@@ -6,10 +6,7 @@
 
 // ====== Helper functions ======
 
-/**
- * @brief Normalize angle between [-pi, +pi]
- * @returns Angle in radians between -pi and pi
- */
+
 double normalizeAngle(double a) {
     return std::atan2(std::sin(a), std::cos(a));
 }
