@@ -22,8 +22,8 @@ class turnPID {
 
         /** 
          * @brief Updates the PID controller
-         * @param target Target value 
-         * @param current Current value
+         * @param target Target angle in radians
+         * @param current Current angle in radians
          * @note dt is measured internally in milliseconds.
          * @return Motor values
          */

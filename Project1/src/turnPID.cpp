@@ -1,5 +1,9 @@
 #include "turnPID.hpp"
+#include "backend/odometry.hpp"
+#include "backend/subsystems.hpp"
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 
 // * You may modify the implementation of any function within this file
 
@@ -14,35 +18,61 @@ constexpr double KD = 0.0;
 turnPID::turnPID() : m_config{KP, KI, KD} {}
 
 motorValues turnPID::update(double target, double current) {
-    // TODO: Calculate dt in ms
-    // * HINT: steady_clock::now() and std::chrono::duration<double, std::milli>
+    double error, derivative = 0.0;
 
-    // TODO: Fill this out with your PID control logic to calculate the motor values based on the target and current angles.
-    // pid_output = (error * kp) + (integral * ki) + (derivative * kd)
+    const auto now = std::chrono::steady_clock::now();
+    const double dt = std::chrono::duration<double, std::milli>(now - m_prevUpdateTime).count();
+    m_prevUpdateTime = now;
 
-    return {0.0, 0.0}; // Replace with the calculated motor values.
+    error = std::remainder(target - current, 2.0 * M_PI);
+    m_integral += error * dt;
+    if (dt > 0.0) {
+        derivative = std::remainder(error - m_prevError, 2.0 * M_PI) / dt;
+    }
+    m_prevError = error;
+
+    double output = m_config.m_kp * error 
+        + m_config.m_ki * m_integral
+        + m_config.m_kd * derivative;
+
+    output = std::clamp(output, -127.0, 127.0);
+
+    // Positive heading error requires a counterclockwise turn.
+    return {-output, output};
 }
 
 void turnPID::turnAbsolute(double target) {
-    // TODO: Fill this out with your logic to turn the robot to an absolute angle using the PID controller.
+    const double targetRadians = target * M_PI / 180.0;
+    reset();
+    m_prevError = std::remainder(targetRadians - odom.getYaw(), 2.0 * M_PI);
+    
+    // Stop after 100 ms within one degree, or after 3 seconds.
+    const auto start = pros::millis();
+    int settled = 0;
+    double currentHeading;
+    while (pros::millis() - start < 3000 && settled < 10) {
+        currentHeading = odom.getYaw();
+        if (!std::isfinite(currentHeading) || std::abs(currentHeading) > M_PI
+            || !std::isfinite(targetRadians)) break;
+        const motorValues values = update(targetRadians, currentHeading);
+        settled = std::abs(m_prevError) < M_PI / 180.0 ? settled + 1 : 0;
+        leftMotors.move(values.left);
+        rightMotors.move(values.right);
+        pros::delay(10);
+    }
 
-    // Reset, then set m_prevError to the initial angle error.
-    // Repeat until settled or timeout:
-    //   1. Read current heading from odom.getYaw() and convert radians to degrees.
-    //   2. Call update(target, currentHeading); it calculates dt internally.
-    //   3. Apply returned values to the drive motors.
-    //   4. Delay briefly before the next iteration.
-    //   5. Stop both drive motors after the loop
+    leftMotors.move(0);
+    rightMotors.move(0);
 }
 
 void turnPID::turnRelative(double target) {
     // TODO: Fill this out with your logic to turn the robot by a relative angle using the PID controller.
 
-    // Calculate targetDegrees once as the starting heading plus the relative target.
-    // Reset, then set m_prevError to the initial angle error.
+    // Calculate targetRadians once as the starting heading plus target converted to radians.
+    // Reset, then set m_prevError to the initial angle error in radians.
     // Repeat until settled or timeout:
-    //   1. Read current heading from odom.getYaw() and convert radians to degrees.
-    //   2. Call update(targetDegrees, currentHeading); it calculates dt internally.
+    //   1. Read current heading in radians from odom.getYaw().
+    //   2. Call update(targetRadians, currentHeading); it calculates dt internally.
     //   3. Apply returned values to the drive motors.
     //   4. Delay briefly before the next iteration.
     //   5. Stop both drive motors after the loop
