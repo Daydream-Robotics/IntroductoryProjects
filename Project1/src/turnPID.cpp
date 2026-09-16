@@ -42,22 +42,23 @@ motorValues turnPID::update(double target, double current) {
 }
 
 void turnPID::turnAbsolute(double target) {
-    const double targetRadians = target * M_PI / 180.0;
+    double targetRadians = target * M_PI / 180.0;
+
     reset();
-    m_prevError = std::remainder(targetRadians - odom.getYaw(), 2.0 * M_PI);
-    
-    // Stop after 100 ms within one degree, or after 3 seconds.
-    const auto start = pros::millis();
-    int settled = 0;
-    double currentHeading;
-    while (pros::millis() - start < 3000 && settled < 10) {
-        currentHeading = odom.getYaw();
-        if (!std::isfinite(currentHeading) || std::abs(currentHeading) > M_PI
-            || !std::isfinite(targetRadians)) break;
-        const motorValues values = update(targetRadians, currentHeading);
-        settled = std::abs(m_prevError) < M_PI / 180.0 ? settled + 1 : 0;
+
+    m_prevError = std::remainder(
+        targetRadians - odom.getYaw(),
+        2.0 * M_PI
+    );
+
+    while (std::abs(m_prevError) > M_PI / 180.0) {
+        double currentHeading = odom.getYaw();
+
+        motorValues values = update(targetRadians, currentHeading);
+
         leftMotors.move(values.left);
         rightMotors.move(values.right);
+
         pros::delay(10);
     }
 
