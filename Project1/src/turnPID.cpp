@@ -20,8 +20,8 @@ turnPID::turnPID() : m_config{KP, KI, KD} {}
 motorValues turnPID::update(double target, double current) {
     double error, derivative = 0.0;
 
-    const auto now = std::chrono::steady_clock::now();
-    const double dt = std::chrono::duration<double, std::milli>(now - m_prevUpdateTime).count();
+    auto now = std::chrono::steady_clock::now();
+    double dt = std::chrono::duration<double>(now - m_prevUpdateTime).count();
     m_prevUpdateTime = now;
 
     error = std::remainder(target - current, 2.0 * M_PI);
