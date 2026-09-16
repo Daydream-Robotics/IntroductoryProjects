@@ -76,6 +76,11 @@ void turnPID::turnRelative(double target) {
     //   3. Apply returned values to the drive motors.
     //   4. Delay briefly before the next iteration.
     //   5. Stop both drive motors after the loop
+
+    double currentHeading = odom.getYaw();
+    double currentDegrees = currentHeading * 180.0 / M_PI;
+
+    turnAbsolute(currentDegrees + target);
 }
 
 void turnPID::reset() {
